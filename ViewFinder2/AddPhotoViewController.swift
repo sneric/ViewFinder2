@@ -10,6 +10,7 @@ import UIKit
 
 class AddPhotoViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    
     var imagePicker = UIImagePickerController ()
     
     @IBOutlet weak var photoToSave: UIImageView!
@@ -22,6 +23,28 @@ class AddPhotoViewController: UIViewController, UIImagePickerControllerDelegate,
         // Do any additional setup after loading the view.
     }
     
+    
+    @IBAction func savePhotoTapped(_ sender: UIButton) {
+        
+        if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+            //we are in our core data database
+            
+            let newCDPhoto = Photos(entity: Photos.entity(), insertInto: context)
+            //whatever text they typed it, it will become the caption of the photo we just saved.
+            newCDPhoto.caption = captionInput.text
+        
+            if let userImage = photoToSave.image {
+                if let userImageData = userImage.pngData() {
+                    newCDPhoto.imageData = userImageData
+                }
+            }
+            //update all of this in core data
+            (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+            
+            //send us to table with pic and text saved
+            navigationController?.popViewController(animated: true)
+        }
+    }
     
     @IBAction func cameraTapped(_ sender: UIButton) {
         imagePicker.sourceType = .camera
